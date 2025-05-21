@@ -1,21 +1,63 @@
 from flask import Flask, render_template, request, jsonify
-import sqlite3
+# import sqlite3
 from datetime import datetime
+import os
+import mysql.connector
 
-# Create Flask app
+
 app = Flask(__name__)
+
+# DB_NAME = 'blog.sqlite'
+
+# Ensure DB and table exist
+# def init_db():
+#     conn = sqlite3.connect(DB_NAME)
+#     cursor = conn.cursor()
+#     cursor.execute('''
+#         CREATE TABLE IF NOT EXISTS posts (
+#             id INTEGER PRIMARY KEY AUTOINCREMENT,
+#             title TEXT NOT NULL,
+#             content TEXT NOT NULL,
+#             author TEXT NOT NULL,
+#             created_at TEXT NOT NULL
+#         )
+#     ''')
+#     conn.commit()
+#     conn.close()
 
 # DB Connection helper
 def dbConnection():
-    conn = None
-    try:
-        conn = sqlite3.connect('blog.sqlite')
-        conn.row_factory = sqlite3.Row  # For dict-like access
-    except sqlite3.error as e:
-        print(e)
-    return conn
+       return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",           # XAMPP default is empty
+        database="blogdb"
+    )
 
-# GET all posts or POST a new post
+# Load posts for rendering HTML
+def load_posts(page=1, per_page=4):
+    conn = dbConnection()
+    cursor = conn.cursor(dictionary=True)
+
+    offset = (page - 1) * per_page
+
+    # Total count
+    cursor.execute("SELECT COUNT(*) as total FROM posts")
+    total_posts = cursor.fetchone()['total']
+    total_pages = (total_posts + per_page - 1) // per_page
+
+    # Fetch paginated posts
+    cursor.execute("""
+        SELECT * FROM posts
+        ORDER BY created_at DESC
+        LIMIT %s OFFSET %s
+    """, (per_page, offset))
+    posts = cursor.fetchall()
+    conn.close()
+
+    return posts, total_pages
+
+# API: GET all posts or POST a new one
 @app.route("/api/posts", methods=['GET', 'POST'])
 def post_list():
     conn = dbConnection()
@@ -25,16 +67,15 @@ def post_list():
         cursor.execute("SELECT * FROM posts")
         posts = [dict(row) for row in cursor.fetchall()]
         conn.close()
-
         if posts:
             return jsonify(posts)
-        else:
-            return jsonify({"message": "No posts found"}), 404
+        return jsonify({"message": "No posts found"}), 404
 
     if request.method == 'POST':
-        new_title = request.form.get('title')
-        new_author = request.form.get('author')
-        new_content = request.form.get('content')
+        data = request.get_json()
+        new_title = data.get('title')
+        new_author = data.get('author')
+        new_content = data.get('content')
 
         if not all([new_title, new_author, new_content]):
             return jsonify({"message": "Missing required fields"}), 400
@@ -45,16 +86,13 @@ def post_list():
         conn.commit()
         post_id = cursor.lastrowid
         conn.close()
+        return jsonify({"message": f"Post with ID {post_id} created successfully"}), 201
 
-        return jsonify({"message": f"Post with id {post_id} created successfully"}), 201
-
-# GET, PUT, DELETE a single post by ID
+# API: GET, PUT, DELETE a single post
 @app.route("/api/posts/<int:id>", methods=['GET', 'PUT', 'DELETE'])
 def single_post(id):
     conn = dbConnection()
     cursor = conn.cursor()
-
-    # Check if the post exists
     cursor.execute("SELECT * FROM posts WHERE id=?", (id,))
     post = cursor.fetchone()
 
@@ -68,9 +106,10 @@ def single_post(id):
         return jsonify(result)
 
     if request.method == 'PUT':
-        title = request.form.get('title', post['title'])
-        content = request.form.get('content', post['content'])
-        author = request.form.get('author', post['author'])
+        data = request.get_json()
+        title = data.get('title', post['title'])
+        content = data.get('content', post['content'])
+        author = data.get('author', post['author'])
 
         cursor.execute("""
             UPDATE posts SET title=?, content=?, author=? WHERE id=?
@@ -85,21 +124,21 @@ def single_post(id):
         conn.close()
         return jsonify({"message": f"Post with ID {id} deleted successfully"}), 200
 
-# Homepage
+# Web Page: Homepage showing posts
 @app.route("/")
 def home():
-    return render_template("index.html")
+    page = int(request.args.get('page', 1))
+    per_page = 4
 
-# Post management page
+    posts, total_pages = load_posts(page, per_page)
+    return render_template('index.html', posts=posts, page=page, total_pages=total_pages)
+
+# Web Page: Post management
 @app.route("/post-management")
 def post_management():
     return render_template("posts/post_management.html")
 
-# Dynamic greeting
-@app.route("/<name>")
-def greet_user(name):
-    return f"Welcome {name}"
-
-# Run the app
+# Initialize and run
 if __name__ == '__main__':
+    # init_db()
     app.run(debug=True)
