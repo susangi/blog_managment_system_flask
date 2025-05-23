@@ -1,27 +1,10 @@
-import sqlite3
+import mysql.connector
 
-# Connect to SQLite database (creates it if it doesn't exist)
-conn = sqlite3.connect("blog.sqlite")
-
-# Create a cursor object to execute SQL commands
-cursor = conn.cursor()
-
-# SQL query to create the 'posts' table with a created_at timestamp
-sql_query = """
-CREATE TABLE IF NOT EXISTS posts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    author TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-"""
-
-# Execute the query
-cursor.execute(sql_query)
-
-# Commit the changes and close the connection
-conn.commit()
-conn.close()
-
-print("Table 'posts' created with automatic timestamp for created_at.")
+def dbConnection():
+    conn = mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='',
+        database='blogdb'
+    )
+    return conn
