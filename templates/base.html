@@ -56,41 +56,6 @@
     <!-- Body Layout -->
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-2 sidebar">
-                <!-- <h5 class="mb-2"><a href="/"> Home</h5> -->
-                <hr />
-                <h5>Lessons</h5>
-                <div class="accordion" id="lessonAccordion">
-                    {% for lesson in lessons %}
-                    <div class="accordion-item bg-dark border-0">
-                        <h2 class="accordion-header" id="heading{{ lesson.id }}">
-                            <button class="accordion-button collapsed bg-dark text-white" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#collapse{{ lesson.id }}"
-                                aria-expanded="false" aria-controls="collapse{{ lesson.id }}">
-                                {{ lesson.title }}
-                            </button>
-                        </h2>
-                        <div id="collapse{{ lesson.id }}" class="accordion-collapse collapse"
-                            aria-labelledby="heading{{ lesson.id }}" data-bs-parent="#lessonAccordion">
-                            <div class="accordion-body p-2">
-                                <ul class="list-group">
-                                    {% for topic in lesson.topics %}
-                                    <li class="list-group-item bg-dark border-0 px-2 py-1">
-                                        <a href="/lessons/{{ lesson.id }}" class="text-white d-block">
-                                            {{ topic.title }}
-                                        </a>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                <hr />
-            </div>
-
             <!-- Main Content -->
             <div class="col-md-10 py-4">
                 {% block content %}{% endblock %}
