@@ -1,0 +1,36 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Manage Blogs{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Blog Management</h2>
+<a href="{{ url_for('blog_admin.create_blog') }}" class="btn btn-success mb-3">+ New Blog</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Caption</th>
+            <th>Updated</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for blog in blogs %}
+        <tr>
+            <td>{{ blog.id }}</td>
+            <td>{{ blog.title }}</td>
+            <td>{{ blog.caption }}</td>
+            <td>{{ blog.updated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>
+                <a href="{{ url_for('blog_admin.edit_blog', id=blog.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                <form method="POST" action="{{ url_for('blog_admin.delete_blog', id=blog.id) }}" style="display:inline;" onsubmit="return confirm('Delete this blog?');">
+                    <button class="btn btn-sm btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

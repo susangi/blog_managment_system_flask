@@ -1,0 +1,23 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}{{ 'Edit' if blog else 'Create' }} Blog{% endblock %}
+
+{% block content %}
+<h2>{{ 'Edit' if blog else 'Create' }} Blog</h2>
+<form method="POST">
+    <div class="mb-3">
+        <label class="form-label">Title</label>
+        <input type="text" name="title" class="form-control" value="{{ blog.title if blog else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Caption</label>
+        <input type="text" name="caption" class="form-control" value="{{ blog.caption if blog else '' }}">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Content</label>
+        <textarea name="content" class="form-control" rows="6">{{ blog.content if blog else '' }}</textarea>
+    </div>
+    <button class="btn btn-primary">{{ 'Update' if blog else 'Create' }}</button>
+    <a href="{{ url_for('blog_admin.list_blogs') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

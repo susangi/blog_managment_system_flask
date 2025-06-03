@@ -49,9 +49,7 @@
             <div class="col-md-2 sidebar">
                 <h5>Manage</h5>
                 <a href="{{ url_for('admin_content.dashboard') }}">Dashboard</a>
-                <a href="{{ url_for('lesson_admin.list_lessons') }}">Lessons</a>
-                <a href="{{ url_for('admin_content.manage_topics') }}">Topics</a>
-                <a href="{{ url_for('admin_content.manage_contents') }}">Contents</a>
+                <a href="{{ url_for('blog_admin.list_blogs') }}">Blogs</a>
             </div>
             <div class="col-md-10 p-4">
                 {% block content %}{% endblock %}
