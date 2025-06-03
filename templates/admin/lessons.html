@@ -1,0 +1,58 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Manage Lessons{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Lesson Management</h2>
+
+<form method="POST" action="{{ url_for('lesson_admin.create_lesson') }}" class="row g-3 mb-4">
+    <div class="col-md-5">
+        <input type="text" name="title" class="form-control" placeholder="Lesson Title" required>
+    </div>
+    <div class="col-md-5">
+        <input type="text" name="description" class="form-control" placeholder="Lesson Description">
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-success w-100">Add Lesson</button>
+    </div>
+</form>
+
+<table id="lessonTable" class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lesson in lessons %}
+        <tr>
+            <td>{{ lesson.id }}</td>
+            <td>{{ lesson.title }}</td>
+            <td>{{ lesson.description }}</td>
+            <td>
+                <a href="{{ url_for('lesson_admin.edit_lesson', id=lesson.id) }}"
+                    class="btn btn-sm btn-primary">Edit</a>
+                <form method="POST" action="{{ url_for('lesson_admin.delete_lesson', id=lesson.id) }}"
+                    style="display:inline;" onsubmit="return confirm('Delete this lesson?');">
+                    <button class="btn btn-sm btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- DataTables JS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#lessonTable').DataTable();
+    });
+</script>
+{% endblock %}
