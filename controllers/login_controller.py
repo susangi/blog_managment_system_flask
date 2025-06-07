@@ -25,7 +25,7 @@ def login():
         if user and check_password_hash(user['password_hash'], password):
             session['admin_logged_in'] = True
             session['username'] = user['username']
-            return redirect(url_for('admin_content.dashboard'))  # Ensure correct endpoint here
+            return redirect(url_for('home.dashboard'))  # Ensure correct endpoint here
         else:
             flash('Invalid credentials', 'danger')
 

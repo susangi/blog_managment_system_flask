@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, session, redirect, url_for
 from db import dbConnection
 
 home_bp = Blueprint('home', __name__)
@@ -29,6 +29,11 @@ def home():
 
     return render_template('blog_list.html', blogs=blogs, page=page, total_pages=total_pages)
 
+@home_bp.route('/dashboard')
+def dashboard():
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin.login'))
 
+    return render_template('admin/dashboard.html')
 
 
