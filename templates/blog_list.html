@@ -1,47 +1,83 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
 
-{% block content %}
 <div class="container">
-    <div class="row">
-        {% for blog in blogs %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <img src="{{ url_for('static', filename='img/blogs/{}/{}.png'.format(blog.id, blog.id)) }}" 
-                     class="card-img-top" alt="{{ blog.title }}">
-                <div class="card-body">
-                    <h5 class="card-title">{{ blog.title }}</h5>
-                    <p class="card-text">{{ blog.caption }}</p>
-                    <a href="{{ url_for('blog.blog_detail', blog_id=blog.id) }}" class="btn btn-outline-primary btn-sm">Read More</a>
-                </div>
-                <div class="card-footer">
-                    <small class="text-muted">Last updated: {{ blog.updated_at.strftime('%Y-%m-%d %H:%M') }}</small>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+  <!-- Add Intro Here -->
+  <section class="text-center py-5 bg-light border rounded shadow-sm mb-5">
+    <div class="container">
+      <h1 class="display-5 fw-bold">Welcome to My Python Blog</h1>
+      <p class="lead mt-3">
+        This platform is dedicated to sharing practical knowledge, tutorials,
+        and project ideas in <strong>Python programming</strong>. Whether you're
+        just starting your coding journey or looking to sharpen your skills,
+        you'll find helpful content, real-world examples, and insights that make
+        learning Python engaging and effective.
+      </p>
+      <p class="mt-2 text-muted">
+        Follow along as we explore the power of Python — from web development to
+        automation, data science, and beyond.
+      </p>
     </div>
+  </section>
 
-    <!-- Pagination Controls -->
-    <div class="text-center mt-4">
-        <nav>
-            <ul class="pagination justify-content-center">
-                {% if page > 1 %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('blog.blog_list', page=page-1) }}">Previous</a>
-                </li>
-                {% endif %}
-                {% for p in range(1, total_pages + 1) %}
-                <li class="page-item {% if p == page %}active{% endif %}">
-                    <a class="page-link" href="{{ url_for('blog.blog_list', page=p) }}">{{ p }}</a>
-                </li>
-                {% endfor %}
-                {% if page < total_pages %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('blog.blog_list', page=page+1) }}">Next</a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
+  <!-- Then optionally show featured blogs or latest blogs -->
+  <div class="row">
+    {% for blog in blogs %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <img
+          src="{{ url_for('static', filename='img/blogs/{}/{}.png'.format(blog.id, blog.id)) }}"
+          class="card-img-top"
+          alt="{{ blog.title }}"
+        />
+        <div class="card-body">
+          <h5 class="card-title">{{ blog.title }}</h5>
+          <p class="card-text">{{ blog.caption }}</p>
+          <a
+            href="{{ url_for('blog.blog_detail', blog_id=blog.id) }}"
+            class="btn btn-outline-primary btn-sm"
+            >Read More</a
+          >
+        </div>
+        <div class="card-footer">
+          <small class="text-muted"
+            >Last updated: {{ blog.updated_at.strftime('%Y-%m-%d %H:%M')
+            }}</small
+          >
+        </div>
+      </div>
     </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="text-center mt-4">
+    <nav>
+      <ul class="pagination justify-content-center">
+        {% if page > 1 %}
+        <li class="page-item">
+          <a
+            class="page-link"
+            href="{{ url_for('blog.blog_list', page=page-1) }}"
+            >Previous</a
+          >
+        </li>
+        {% endif %} {% for p in range(1, total_pages + 1) %}
+        <li class="page-item {% if p == page %}active{% endif %}">
+          <a class="page-link" href="{{ url_for('blog.blog_list', page=p) }}"
+            >{{ p }}</a
+          >
+        </li>
+        {% endfor %} {% if page < total_pages %}
+        <li class="page-item">
+          <a
+            class="page-link"
+            href="{{ url_for('blog.blog_list', page=page+1) }}"
+            >Next</a
+          >
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
 </div>
 {% endblock %}

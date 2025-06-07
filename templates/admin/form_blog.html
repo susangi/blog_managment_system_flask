@@ -1,0 +1,118 @@
+{% extends 'admin/admin_base.html' %} {% block title %}{{ 'Edit' if blog else
+'Create' }} Blog{% endblock %} {% block content %}
+<h2>{{ 'Edit' if blog else 'Create' }} Blog</h2>
+<form method="POST" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">Title</label>
+    <input
+      type="text"
+      name="title"
+      class="form-control"
+      value="{{ blog.title if blog else '' }}"
+      required
+    />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Caption</label>
+    <input
+      type="text"
+      name="caption"
+      class="form-control"
+      value="{{ blog.caption if blog else '' }}"
+      required
+    />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Poster Image (.png only)</label>
+    <input
+      type="file"
+      name="poster"
+      accept="image/png"
+      class="form-control"
+      {%
+      if
+      not
+      blog
+      %}required{%
+      endif
+      %}
+    />
+    {% if blog %}
+    <div class="mt-2">
+      <strong>Current Image:</strong><br />
+      <img
+        src="{{ url_for('static', filename='img/blogs/' ~ blog.id ~ '/' ~ blog.id ~ '.png') }}"
+        alt="Poster"
+        style="max-width: 200px"
+      />
+    </div>
+    {% endif %}
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Content</label>
+    <div id="editor" style="height: 300px"></div>
+    <input type="hidden" name="content" id="content" required />
+  </div>
+  <button class="btn btn-primary">{{ 'Update' if blog else 'Create' }}</button>
+  <a href="{{ url_for('blog_admin.list_blogs') }}" class="btn btn-secondary"
+    >Cancel</a
+  >
+</form>
+{% endblock %} {% block scripts %}
+<!-- Quill Editor -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+<script>
+  const quill = new Quill('#editor', {
+    theme: 'snow',
+    placeholder: 'Write your blog content here...',
+    modules: {
+      toolbar: {
+        container: [
+          [{ 'header': [1, 2, 3, false] }],
+          ['bold', 'italic', 'underline'],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+          ['link', 'image'],
+          ['clean']
+        ],
+        handlers: {
+          image: function () {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.click();
+
+            input.onchange = () => {
+              const file = input.files[0];
+              const formData = new FormData();
+              formData.append('image', file);
+
+              fetch('/admin/blogs/upload-image', {
+                method: 'POST',
+                body: formData
+              })
+              .then(res => res.json())
+              .then(data => {
+                const range = quill.getSelection();
+                quill.insertEmbed(range.index, 'image', data.url);
+              });
+            };
+          }
+        }
+      }
+    }
+  });
+
+  // Pre-fill editor content if editing
+  {% if blog and blog.content %}
+    quill.root.innerHTML = {{ blog.content|tojson|safe }};
+  {% endif %}
+
+  // Sync on submit
+  document.querySelector('form').onsubmit = () => {
+    document.querySelector('#content').value = quill.root.innerHTML;
+  };
+</script>
+{% endblock %}

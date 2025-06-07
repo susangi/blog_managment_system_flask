@@ -8,9 +8,12 @@ from controllers.lesson_admin_controller import lesson_admin_bp
 from controllers.blog_controller import blog_bp
 from controllers.blog_admin_controller import blog_admin_bp
 from config import SECRET_KEY
+import os
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY 
+app.config['UPLOAD_FOLDER'] = os.path.join('static', 'img')
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
 
 # Define the routes
 # Register Blueprints
